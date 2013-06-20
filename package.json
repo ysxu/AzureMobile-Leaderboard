@@ -1,5 +1,5 @@
 {
-  "name": "azure-leaderboard",
+  "name": "azuremobile-leaderboard",
   "version": "0.1.1",
   "description": "Azure Leaderboard Recipe",
   "main": "azure-leaderboard.js",
@@ -7,7 +7,7 @@
   "dependencies": {
     "azure-scripty":"~0.1.0"
   },
-  "bin":{"azureleaderboard":"./bin/leaderboard.js"},
+  "bin":{"azuremobile-leaderboard":"./bin/leaderboard.js"},
   "repository": {
     "type": "git",
     "url": "git://github.com/ysxu/AzureMobile-Leaderboard.git"

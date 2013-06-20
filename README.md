@@ -9,12 +9,12 @@ The general code flow and Result table action script follow the instructions at 
 
 ## Install it
 ```bash
-npm install -g azure-leaderboard
+npm install -g azuremobile-leaderboard
 ```
 
 To set up leaderboard with azure-cli installed and user account downloaded and imported:
 ```bash
-azureleaderboard yourServiceName
+azuremobile-leaderboard yourServiceName
 ```
 
 The module will create a Leaderboard and a Result table as well as configure their action scripts.
