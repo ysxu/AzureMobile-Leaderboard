@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "description": "Azure Leaderboard Recipe",
   "main": "azure-leaderboard.js",
+  "licenses": [ { "type": "Apache", "url": "http://www.apache.org/licenses/LICENSE-2.0" } ],
   "dependencies": {
     "azure-scripty":"~0.1.0"
   },
