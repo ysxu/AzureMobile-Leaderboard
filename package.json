@@ -1,0 +1,23 @@
+{
+  "name": "azure-leaderboard",
+  "version": "0.1.1",
+  "description": "Azure Leaderboard Recipe",
+  "main": "azure-leaderboard.js",
+  "dependencies": {
+    "azure-scripty":"~0.1.0"
+  },
+  "bin":{"azureleaderboard":"./bin/leaderboard.js"},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ysxu/azure-leaderboard.git"
+  },
+  "homepage": "https://github.com/ysxu/azure-leaderboard",
+  "keywords": [
+    "azure",
+    "mobile",
+    "leaderboard",
+    "recipe"
+  ],
+  "author": "Mimi Xu",
+  "readmeFilename": "README.md"
+}
