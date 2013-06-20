@@ -10,9 +10,9 @@
   "bin":{"azureleaderboard":"./bin/leaderboard.js"},
   "repository": {
     "type": "git",
-    "url": "git://github.com/ysxu/azure-leaderboard.git"
+    "url": "git://github.com/ysxu/AzureMobile-Leaderboard.git"
   },
-  "homepage": "https://github.com/ysxu/azure-leaderboard",
+  "homepage": "https://github.com/ysxu/AzureMobile-Leaderboard",
   "keywords": [
     "azure",
     "mobile",
