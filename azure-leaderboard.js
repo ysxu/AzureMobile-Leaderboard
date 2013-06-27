@@ -26,11 +26,10 @@ exports.create = function(){
 	        // error check: service exists
 	        console.log('Validating mobile service '+ myMobileservice+'...');
 			scripty.invoke('mobile show '+ myMobileservice, function(err, results) {
-	    		//console.log("one: "+ err);
 	    		if (err)
 	    			throw err;
 	    		console.log('Validated.\n');
-	        	callback(err, 'one');
+	        	callback(err, results);
 			});
 	    },
 	    function(callback){
@@ -38,7 +37,7 @@ exports.create = function(){
 				if (err)
 					throw err;
 				myLeaderboard = results;
-			    callback(err, 'two');
+			    callback(err, results);
 			});
 	    },
 	    function(callback){
@@ -46,7 +45,7 @@ exports.create = function(){
 	    		if (err)
 	    			throw err;
 				myResult = results;
-	    		callback(err, 'three');
+	    		callback(err, results);
 			});
 	    },
 	    function(callback){
@@ -92,8 +91,24 @@ exports.create = function(){
 		  			throw err;
 		  		else{
 		  			console.log("Action script '"+myInsertscript+"' successfully uploaded.\n");
-					callback(null, 'four');
+					callback(null, results);
 		  		}
+			});
+	    },
+	    function(callback){
+			var curdir = process.cwd();
+	    	var clientdir = curdir + '/client_files';
+	    	// create client_files directory
+			fs.exists(clientdir, function (exists) {
+			  if(!exists){
+			  	fs.mkdir(clientdir, function(err){
+			  		if (err)
+			  			throw err;
+			  		callback(null, 'client dir');
+			  	});
+			  }
+			  else
+			  	callback(null, 'client dir');
 			});
 	    },
 	    // copy client files into user local environment:s
@@ -105,7 +120,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -115,7 +130,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -125,7 +140,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -135,7 +150,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -145,7 +160,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -155,7 +170,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -165,7 +180,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(callback){
@@ -175,7 +190,7 @@ exports.create = function(){
 	    		function(err){
 	    			if (err)
 	    				throw err;
-	    			callback(err, 'five');
+	    			callback(err, 'client file download');
     		});
 	    },
 	    function(){
