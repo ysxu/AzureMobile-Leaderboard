@@ -14,9 +14,9 @@ npm install -g azuremobile-leaderboard
 
 To set up leaderboard with azure-cli installed and user account downloaded and imported:
 ```bash
-azuremobile-leaderboard yourServiceName
+azuremobile-leaderboard
 ```
 
-The module will create a Leaderboard and a Result table as well as configure their action scripts.
+The module will create a Leaderboard table and a Result table, configure their action scripts, and download neccessary client-side files in the same directory as where the module is called.
 
-Complete error checking and testing scripts coming soon.
+Complete testing scripts coming soon.
