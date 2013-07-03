@@ -7,7 +7,7 @@ var scripty = require('azure-scripty');
 var fs = require('fs');
 var async = require('async');
 
-exports.create = function(){
+exports.use = function(){
 
 	// default table names
 	var myMobileservice = "";

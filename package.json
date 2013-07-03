@@ -2,13 +2,13 @@
   "name": "azuremobile-leaderboard",
   "version": "0.1.1",
   "description": "Azure Mobile Services Leaderboard Recipe",
-  "main": "azure-leaderboard.js",
+  "main": "leaderboard.js",
   "licenses": [ { "type": "Apache", "url": "http://www.apache.org/licenses/LICENSE-2.0" } ],
   "dependencies": {
     "azure-scripty":"~0.1.0",
     "async": "~0.1.22"
   },
-  "bin":{"azuremobile-leaderboard":"./bin/leaderboard.js"},
+  "bin":{"azuremobile-leaderboard":"./bin/leaderboard_run.js"},
   "repository": {
     "type": "git",
     "url": "git://github.com/ysxu/AzureMobile-Leaderboard.git"
