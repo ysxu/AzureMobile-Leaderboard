@@ -6,6 +6,7 @@
 var scripty = require('azure-scripty');
 var fs = require('fs');
 var async = require('async');
+var recipe = require('azuremobile-recipe');
 
 exports.use = function(){
 
@@ -17,7 +18,7 @@ exports.use = function(){
 	// async error checking, table creates, and script upload
 	async.series([
 		function(callback){
-			ask("Mobile service name", /[a-z|A-Z]+/, function(name) {
+			recipe.ask("Mobile service name", /[a-z|A-Z]+/, function(name) {
 				myMobileservice = name;
 				callback(null, name);
 			});
@@ -33,7 +34,7 @@ exports.use = function(){
 			});
 	    },
 	    function(callback){
-			tableSetup(myMobileservice,"Leaderboard", function(err, results){
+			recipe.table_create(myMobileservice,"Leaderboard", function(err, results){
 				if (err)
 					throw err;
 				myLeaderboard = results;
@@ -41,7 +42,7 @@ exports.use = function(){
 			});
 	    },
 	    function(callback){
-	    	tableSetup(myMobileservice,"Result", function(err, results){
+	    	recipe.table_create(myMobileservice,"Result", function(err, results){
 	    		if (err)
 	    			throw err;
 				myResult = results;
@@ -53,6 +54,7 @@ exports.use = function(){
 			// insertion scripts
 			var curdir = process.cwd();
 			var insertscript = __dirname + '/table/Result.insert.js';
+			
 		  	var tabledir = curdir + '/table';
 			var myInsertscript = tabledir+ "/" + myResult + '.insert.js';
 
@@ -116,7 +118,7 @@ exports.use = function(){
 	    	console.log("Downloading client files...");
 	    	var folder = 'client_files/Entities';
 	    	var file_name = 'Leaderboard.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name,['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -126,7 +128,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Entities';
 	    	var file_name = 'Result.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -136,7 +138,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'AnswerModel.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -146,7 +148,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'LeaderboardItemModel.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -156,7 +158,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'LeaderboardModel.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -166,7 +168,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'TriviaModel.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -176,7 +178,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'TriviaStepModel.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -186,7 +188,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files';
 	    	var file_name = 'Leaderboard_functions.cs';
-	    	file_download(folder, file_name, myLeaderboard, myResult, 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -197,111 +199,4 @@ exports.use = function(){
 	    	process.exit(1);
 	    }
 	]);
-}
-
-/***************************FUNCTIONS********************************/
-
-// create tables and error check
-function tableSetup(myMobileservice, tablename, callback){
-	var usertablename = tablename;
-	scripty.invoke('mobile table show '+myMobileservice+' '+tablename, function(err, results){
-		if (results.columns!="" || results.scripts!=""){
-			ask("Table '"+tablename+"' exists. Enter a new "+tablename+" name or enter 'conti' to continue with exisiting table", /[a-z|A-Z]+/, function(choice) {
-				if (choice.toLowerCase()!='conti'){
-					usertablename = choice;
-					console.log("New "+tablename+" table '"+usertablename + "' is being created...");
-					// create choice table
-					scripty.invoke('mobile table create ' + myMobileservice + ' '+ usertablename, function(err, results) {
-				  		if (err) 
-				  			throw err;
-				  		else{
-				  			console.log("Table '"+usertablename+"' successfully created.\n");
-				  			callback(err, usertablename);
-				  		}
-					});
-				}
-				else{
-					console.log("Existing table '"+tablename+"' will be used for this module.\n");
-					callback(err, usertablename);
-				}
-
-			});
-		}
-		else{
-			console.log("New "+tablename+" table '"+usertablename + "' is being created...");
-			// create leaderboard table
-			scripty.invoke('mobile table create ' + myMobileservice + ' '+ usertablename, function(err, results) {
-				if (err) 
-				  	throw err;
-				else{
-					console.log("Table '"+usertablename+"' successfully created.\n");
-					callback(err, usertablename);
-				}
-			});
-		}
-	});
-
-}
-
-// download files from module to user environment & customization
-function file_download(folder, file_name, myLeaderboard, myResult, callback){
-			// script location
-			var script = __dirname + '/' + folder + '/' + file_name;
-
-			// user location
-			var curdir = process.cwd();
-		  	var filedir = curdir + '/' + folder;
-			var myScript = filedir + "/" + file_name;
-
-			// create directory for file
-			fs.exists(filedir, function (exists) {
-			  if(!exists){
-			  	fs.mkdir(filedir, function(err){
-			  		if (err)
-			  			throw err;
-			  	});
-			  }
-			});
-
-			// update scripts with customizable information
-			// reference: http://stackoverflow.com/questions/10058814/get-data-from-fs-readfile
-			// read in module file
-			fs.readFile(script, 'utf8', function (err,data) {
-				//console.log(script);
-		  		if (err) 
-		  			throw err;
-
-		  		// replace placeholders
-		  		var result = data.replace(/\$/g, myLeaderboard).replace(/\%/g, myResult);
-
-		  		// write to user environment
-		  		fs.writeFile(myScript, result, 'utf8', function (err) {
-		     		if (err) 
-		     			throw err;
-		     		console.log(folder + '/' + file_name + ' is downloaded.');
-		     		callback(err);
-		  		});
-			});
-
-}
-
-
-// reference: http://st-on-it.blogspot.com/2011/05/how-to-read-user-input-with-nodejs.html
-function ask(question, format, callback) {
-	var stdin = process.stdin, stdout = process.stdout;
-	 
-	stdin.resume();
-	stdout.write(question + ": ");
-	 
-	stdin.once('data', function(data) {
-		data = data.toString().trim();
-	 	//callback(data);
-	 	
-	    if (format.test(data)) {
-	    	callback(data);
-	   	} else {
-	     	stdout.write("It should match: "+ format +"\n");
-	     	ask(question, format, callback);
-	   	}
-	});
 }
