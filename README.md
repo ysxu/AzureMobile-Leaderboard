@@ -6,6 +6,12 @@ The general code flow and Result table action script follow the instructions at 
 
 
 # Getting started
+## Before Installation
+Make sure node.js is installed as well as npm modules azure-cli and azuremobile-recipe
+```bash
+npm install -g azure-cli
+npm install -g azuremobile-recipe
+```
 
 ## Install it
 ```bash
