@@ -5,7 +5,7 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-namespace MyTrivia.Model
+namespace #.Model
 {
     public class LeaderboardItemModel
     {

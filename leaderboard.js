@@ -14,6 +14,7 @@ exports.use = function(){
 	var myMobileservice = "";
 	var myLeaderboard = "Leaderboard";
 	var myResult = "Result";
+	var myNamespace = "";
 
 	// async error checking, table creates, and script upload
 	async.series([
@@ -113,12 +114,18 @@ exports.use = function(){
 			  	callback(null, 'client dir');
 			});
 	    },
+	    function(callback){
+			recipe.ask("Existing app namespace", /[a-z|A-Z]+/, function(name) {
+				myNamespace = name;
+				callback(null, name);
+			});
+		},
 	    // copy client files into user local environment:s
 	    function(callback){
 	    	console.log("Downloading client files...");
 	    	var folder = 'client_files/Entities';
 	    	var file_name = 'Leaderboard.cs';
-	    	recipe.file_download(folder, file_name,['\\$','\\%'], [myLeaderboard, myResult], 
+	    	recipe.file_download(folder, file_name,['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -128,17 +135,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Entities';
 	    	var file_name = 'Result.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
-	    		function(err){
-	    			if (err)
-	    				throw err;
-	    			callback(err, 'client file download');
-    		});
-	    },
-	    function(callback){
-	    	var folder = 'client_files/Model';
-	    	var file_name = 'AnswerModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -148,7 +145,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'LeaderboardItemModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -158,7 +155,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'LeaderboardModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
+	    	recipe.file_download(folder, file_name, ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -166,19 +163,9 @@ exports.use = function(){
     		});
 	    },
 	    function(callback){
-	    	var folder = 'client_files/Model';
-	    	var file_name = 'TriviaModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
-	    		function(err){
-	    			if (err)
-	    				throw err;
-	    			callback(err, 'client file download');
-    		});
-	    },
-	    function(callback){
-	    	var folder = 'client_files/Model';
-	    	var file_name = 'TriviaStepModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
+	    	var folder = 'client_files/Functions';
+	    	var file_name = 'LeaderboardFunctions.cs';
+	    	recipe.file_download(folder, file_name, ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -187,8 +174,18 @@ exports.use = function(){
 	    },
 	    function(callback){
 	    	var folder = 'client_files';
-	    	var file_name = 'Leaderboard_functions.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%'], [myLeaderboard, myResult], 
+	    	var file_name = 'LeaderboardPage.xaml';
+	    	recipe.file_download(folder, file_name, ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
+	    		function(err){
+	    			if (err)
+	    				throw err;
+	    			callback(err, 'client file download');
+    		});
+	    },
+	    function(callback){
+	    	var folder = 'client_files';
+	    	var file_name = 'LeaderboardPage.xaml.cs';
+	    	recipe.file_download(folder, file_name, ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
