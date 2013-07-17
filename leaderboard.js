@@ -8,32 +8,15 @@ var fs = require('fs');
 var async = require('async');
 var recipe = require('azuremobile-recipe');
 
-exports.use = function(){
+exports.use = function(myMobileservice){
 
 	// default table names
-	var myMobileservice = "";
 	var myLeaderboard = "Leaderboard";
 	var myResult = "Result";
 	var myNamespace = "";
 
 	// async error checking, table creates, and script upload
 	async.series([
-		function(callback){
-			recipe.ask("Mobile service name", /[a-z|A-Z]+/, function(name) {
-				myMobileservice = name;
-				callback(null, name);
-			});
-		},
-	    function(callback){
-	        // error check: service exists
-	        console.log('Validating mobile service '+ myMobileservice+'...');
-			scripty.invoke('mobile show '+ myMobileservice, function(err, results) {
-	    		if (err)
-	    			throw err;
-	    		console.log('Validated.\n');
-	        	callback(err, results);
-			});
-	    },
 	    function(callback){
 			recipe.table_create(myMobileservice,"Leaderboard", function(err, results){
 				if (err)
@@ -115,7 +98,7 @@ exports.use = function(){
 			});
 	    },
 	    function(callback){
-			recipe.ask("Existing app namespace", /[a-z|A-Z]+/, function(name) {
+			recipe.ask("Existing app namespace", /^[a-zA-Z][0-9a-zA-Z-]*[0-9a-zA-Z]$/, function(name) {
 				myNamespace = name;
 				callback(null, name);
 			});
@@ -125,7 +108,7 @@ exports.use = function(){
 	    	console.log("Downloading client files...");
 	    	var folder = 'client_files/Entities';
 	    	var file_name = 'Leaderboard.cs';
-	    	recipe.file_download(folder, file_name,['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name],['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -135,7 +118,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Entities';
 	    	var file_name = 'Result.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name], ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -145,7 +128,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'LeaderboardItemModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name], ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -155,7 +138,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Model';
 	    	var file_name = 'LeaderboardModel.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name], ['\\$','\\%', '\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -165,7 +148,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files/Functions';
 	    	var file_name = 'LeaderboardFunctions.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name], ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -175,7 +158,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files';
 	    	var file_name = 'LeaderboardPage.xaml';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name], ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
@@ -185,7 +168,7 @@ exports.use = function(){
 	    function(callback){
 	    	var folder = 'client_files';
 	    	var file_name = 'LeaderboardPage.xaml.cs';
-	    	recipe.file_download(folder, file_name, ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
+	    	recipe.file_download([folder], [file_name], ['\\$','\\%','\\#'], [myLeaderboard, myResult, myNamespace], 
 	    		function(err){
 	    			if (err)
 	    				throw err;
