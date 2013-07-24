@@ -9,12 +9,14 @@
  */
 
  
-public static class Globals {
+public static class Globals
+{
     public static int ResultId;
 }
 
 
-namespace #.Functions {
+namespace #.Functions
+{
 
     using System;
     using System.Diagnostics;
@@ -29,15 +31,16 @@ namespace #.Functions {
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
 
-    public class functions{
+    public class functions
+    {
 
         // insert data into leaderboard tables
         public async Task<int> SendResults(string player, int hits, int misses)
-            {
-                var resultsEntity = new % { PlayerName = player, Hits = hits, Misses = misses };
-                await App.MobileService.GetTable<%>().InsertAsync(resultsEntity);
+        {
+            var resultsEntity = new % { PlayerName = player, Hits = hits, Misses = misses };
+            await App.MobileService.GetTable<%>().InsertAsync(resultsEntity);
 
-                return resultsEntity.Id;
-            }
+            return resultsEntity.Id;
+        }
     }
 }
