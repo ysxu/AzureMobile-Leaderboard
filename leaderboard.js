@@ -16,80 +16,66 @@
    limitations under the License.
 
  */
-
 // scripty & file manipulation & system
 var scripty = require('azure-scripty');
 var fs = require('fs');
 var async = require('async');
 var recipe = require('azuremobile-recipe');
+var path = require('path');
 
+// recipe
 exports.use = function (myMobileservice) {
 
-    // default table names
+    // variable customizations
     var myLeaderboard = "Leaderboard";
     var myResult = "Result";
     var myNamespace = "";
 
-    // async error checking, table creates, and script upload
+    // file customizations
+    var original = [];
+    var replacement = [];
+
     async.series([
         function (callback) {
-            recipe.table_create(myMobileservice, "Leaderboard", function (err, results) {
+            console.log('Checking for table name conflicts...\n');
+
+            // create leaderboard table
+            recipe.createTable(myMobileservice, "Leaderboard", function (err, results) {
                 if (err)
-                    throw err;
+                    callback(err);
                 myLeaderboard = results;
                 callback(err, results);
             });
         },
         function (callback) {
-            recipe.table_create(myMobileservice, "Result", function (err, results) {
+            // create result table
+            recipe.createTable(myMobileservice, "Result", function (err, results) {
                 if (err)
-                    throw err;
+                    callback(err);
                 myResult = results;
                 callback(err, results);
             });
         },
         function (callback) {
-            console.log("Uploading action scripts...")
-            // insertion scripts
-            var curdir = process.cwd();
-            var insertscript = __dirname + '/table/Result.insert.js';
+            // retreive result table action script
+            console.log("Downloading & Uploading action scripts...")
 
-            var tabledir = curdir + '/table';
-            var myInsertscript = tabledir + "/" + myResult + '.insert.js';
+            original = ['\\$', '\\%'];
+            replacement = [myLeaderboard, myResult];
 
-            // create table directory
-            fs.exists(tabledir, function (exists) {
-                if (!exists) {
-                    fs.mkdir(tabledir, function (err) {
-                        if (err)
-                            throw err;
-                    });
-                }
-            });
-
-            // update scripts with myLeaderboard and myResult
-            // reference: http://stackoverflow.com/questions/10058814/get-data-from-fs-readfile
-            fs.readFile(insertscript, 'utf8', function (err, data) {
-                if (err)
-                    throw err;
-
-                // replace placeholders
-                var result = data.replace(/\$/g, myLeaderboard).replace(/\%/g, myResult);
-
-                fs.writeFile(myInsertscript, result, 'utf8', function (err) {
+            recipe.downloadFile(['/table'], ['Result.insert.js', myResult + '.insert.js'], original, replacement,
+                function (err) {
                     if (err)
-                        throw err;
+                        callback(err);
+                    callback(err, 'table action script downloaded');
                 });
-            });
-
-            // modify uploading script
-            var cut = myInsertscript.indexOf(curdir);
-            myInsertscript = myInsertscript.slice(0, cut) + myInsertscript.slice(cut + curdir.length + 1, myInsertscript.length);
-
-            // upload script
+        },
+        function (callback) {
+            // upload result table action script
+            var myInsertscript = 'table/' + myResult + '.insert.js';
             scripty.invoke('mobile script upload ' + myMobileservice + ' ' + myInsertscript, function (err, results) {
                 if (err)
-                    throw err;
+                    callback(err);
                 else {
                     console.log("Action script '" + myInsertscript + "' successfully uploaded.\n");
                     callback(null, results);
@@ -97,95 +83,39 @@ exports.use = function (myMobileservice) {
             });
         },
         function (callback) {
-            var curdir = process.cwd();
-            var clientdir = curdir + '/client_files';
-            // create client_files directory
-            fs.exists(clientdir, function (exists) {
-                if (!exists) {
-                    fs.mkdir(clientdir, function (err) {
-                        if (err)
-                            throw err;
-                        callback(null, 'client dir');
-                    });
-                } else
-                    callback(null, 'client dir');
-            });
-        },
-        function (callback) {
-            recipe.ask("Existing app namespace", /^[a-zA-Z][0-9a-zA-Z-]*[0-9a-zA-Z]$/, function (name) {
+            // prompt for existing app namespace
+            recipe.ask("Existing app namespace", recipe.REGEXP, function (name) {
                 myNamespace = name;
                 callback(null, name);
             });
         },
-        // copy client files into user local environment:s
         function (callback) {
-            console.log("Downloading client files...");
-            var folder = 'client_files/Entities';
-            var file_name = 'Leaderboard.cs';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
-                function (err) {
-                    if (err)
-                        throw err;
-                    callback(err, 'client file download');
-                });
+            original = ['\\$', '\\%', '\\#'];
+            replacement = [myLeaderboard, myResult, myNamespace];
+
+            // find all client files
+            recipe.readPath(path.join(__dirname, './client_files'), function (err, results) {
+                if (err)
+                    throw err;
+                files = results;
+                callback(err, results);
+            });
         },
         function (callback) {
-            var folder = 'client_files/Entities';
-            var file_name = 'Result.cs';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
+            // download all client files and create directories
+            async.forEachSeries(
+                files,
+                function (file, done) {
+                    recipe.downloadFile([file.dir.replace(__dirname,'')], [file.file], original, replacement,
+                        function (err) {
+                            if (err)
+                                callback(err);
+                            done();
+                        });
+                },
                 function (err) {
                     if (err)
-                        throw err;
-                    callback(err, 'client file download');
-                });
-        },
-        function (callback) {
-            var folder = 'client_files/Model';
-            var file_name = 'LeaderboardItemModel.cs';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
-                function (err) {
-                    if (err)
-                        throw err;
-                    callback(err, 'client file download');
-                });
-        },
-        function (callback) {
-            var folder = 'client_files/Model';
-            var file_name = 'LeaderboardModel.cs';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
-                function (err) {
-                    if (err)
-                        throw err;
-                    callback(err, 'client file download');
-                });
-        },
-        function (callback) {
-            var folder = 'client_files/Functions';
-            var file_name = 'LeaderboardFunctions.cs';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
-                function (err) {
-                    if (err)
-                        throw err;
-                    callback(err, 'client file download');
-                });
-        },
-        function (callback) {
-            var folder = 'client_files';
-            var file_name = 'LeaderboardPage.xaml';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
-                function (err) {
-                    if (err)
-                        throw err;
-                    callback(err, 'client file download');
-                });
-        },
-        function (callback) {
-            var folder = 'client_files';
-            var file_name = 'LeaderboardPage.xaml.cs';
-            recipe.file_download([folder], [file_name], ['\\$', '\\%', '\\#'], [myLeaderboard, myResult, myNamespace],
-                function (err) {
-                    if (err)
-                        throw err;
+                        callback(err);
                     callback(err, 'client file download');
                 });
         },
