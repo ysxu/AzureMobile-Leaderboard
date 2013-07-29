@@ -24,7 +24,7 @@ var recipe = require('azuremobile-recipe');
 var path = require('path');
 
 // recipe
-exports.use = function (myMobileservice) {
+exports.use = function (myMobileservice, callback) {
 
     // variable customizations
     var myLeaderboard = "Leaderboard";
@@ -41,19 +41,17 @@ exports.use = function (myMobileservice) {
 
             // create leaderboard table
             recipe.createTable(myMobileservice, "Leaderboard", function (err, results) {
-                if (err)
-                    callback(err);
+                if (err) return callback(err);
                 myLeaderboard = results;
-                callback(err, results);
+                callback();
             });
         },
         function (callback) {
             // create result table
             recipe.createTable(myMobileservice, "Result", function (err, results) {
-                if (err)
-                    callback(err);
+                if (err) return callback(err);
                 myResult = results;
-                callback(err, results);
+                callback();
             });
         },
         function (callback) {
@@ -65,20 +63,18 @@ exports.use = function (myMobileservice) {
 
             recipe.downloadFile(['/table'], ['Result.insert.js', myResult + '.insert.js'], original, replacement,
                 function (err) {
-                    if (err)
-                        callback(err);
-                    callback(err, 'table action script downloaded');
+                    if (err) return callback(err);
+                    callback();
                 });
         },
         function (callback) {
             // upload result table action script
             var myInsertscript = 'table/' + myResult + '.insert.js';
             scripty.invoke('mobile script upload ' + myMobileservice + ' ' + myInsertscript, function (err, results) {
-                if (err)
-                    callback(err);
+                if (err) return callback(err);
                 else {
                     console.log("Action script '" + myInsertscript + "' successfully uploaded.\n");
-                    callback(null, results);
+                    callback();
                 }
             });
         },
@@ -95,10 +91,9 @@ exports.use = function (myMobileservice) {
 
             // find all client files
             recipe.readPath(path.join(__dirname, './client_files'), function (err, results) {
-                if (err)
-                    throw err;
+                if (err) return callback(err);
                 files = results;
-                callback(err, results);
+                callback();
             });
         },
         function (callback) {
@@ -108,19 +103,17 @@ exports.use = function (myMobileservice) {
                 function (file, done) {
                     recipe.downloadFile([file.dir.replace(__dirname,'')], [file.file], original, replacement,
                         function (err) {
-                            if (err)
-                                callback(err);
+                            if (err) return callback(err);
                             done();
                         });
                 },
                 function (err) {
-                    if (err)
-                        callback(err);
-                    callback(err, 'client file download');
+                    if (err) return callback(err);
+                    callback();
                 });
         },
         function () {
-            process.exit(1);
+            callback();
         }
     ]);
 }
