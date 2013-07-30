@@ -55,12 +55,12 @@ exports.use = function (myMobileservice, log, recipe, callback) {
 
             original = ['\\$', '\\%'];
             replacement = [myLeaderboard, myResult];
-
-            recipe.copyFile('azuremobile-'+recipename, ['/table'], ['Result.insert.js', myResult + '.insert.js'], original, replacement,
-                function (err) {
-                    if (err) return callback(err);
-                    callback();
-                });
+            var action_file = [{dir: 'table', file: 'Result.insert.js', new_file: myResult+'.insert.js', original: original, replacement:replacement}];
+            
+            recipe.copyFiles(recipename, action_file, function(err){
+                if (err) return callback(err);
+                callback();
+            });
         },
         function (callback) {
             // upload result table action script
@@ -81,31 +81,36 @@ exports.use = function (myMobileservice, log, recipe, callback) {
             });
         },
         function (callback) {
-            original = ['\\$', '\\%', '\\#'];
-            replacement = [myLeaderboard, myResult, myNamespace];
-
             // find all client files
-            recipe.readPath(recipe.path.join(__dirname, './client_files'), function (err, results) {
+            recipe.readPath(recipe.path.join(__dirname, './client_files'), __dirname, function (err, results) {
                 if (err) return callback(err);
                 files = results;
                 callback();
             });
         },
         function (callback) {
-            // copy all client files and create directories
+            original = ['\\$', '\\%', '\\#'];
+            replacement = [myLeaderboard, myResult, myNamespace];
+
+            // format client files
             recipe.async.forEachSeries(
                 files,
                 function (file, done) {
-                    recipe.copyFile('azuremobile-'+recipename,[file.dir.replace(__dirname,'')], [file.file], original, replacement,
-                        function (err) {
-                            if (err) return callback(err);
-                            done();
-                        });
+                    file.original = original;
+                    file.replacement = replacement;
+                    done();
                 },
                 function (err) {
                     if (err) return callback(err);
                     callback();
                 });
+        },
+        function (callback) {
+            // copy client files to user environment
+            recipe.copyFiles(recipename, files, function(err){
+                if (err) return callback(err);
+                callback();
+            });
         },
         function () {
             callback();
