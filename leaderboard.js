@@ -16,17 +16,12 @@
    limitations under the License.
 
  */
-// scripty & file manipulation & system
-var scripty = require('azure-scripty');
-var fs = require('fs');
-var async = require('async');
-var recipe = require('azuremobile-recipe');
-var path = require('path');
 
-// recipe
-exports.use = function (myMobileservice, callback) {
+exports.use = function (myMobileservice, log, recipe, callback) {
 
     // variable customizations
+    var recipename = 'leaderboard';
+    
     var myLeaderboard = "Leaderboard";
     var myResult = "Result";
     var myNamespace = "";
@@ -35,9 +30,9 @@ exports.use = function (myMobileservice, callback) {
     var original = [];
     var replacement = [];
 
-    async.series([
+    recipe.async.series([
         function (callback) {
-            console.log('Checking for table name conflicts...\n');
+            log.info('Checking for table name conflicts...\n');
 
             // create leaderboard table
             recipe.createTable(myMobileservice, "Leaderboard", function (err, results) {
@@ -56,12 +51,12 @@ exports.use = function (myMobileservice, callback) {
         },
         function (callback) {
             // retreive result table action script
-            console.log("Downloading & Uploading action scripts...")
+            log.info("Copying & Uploading action scripts...")
 
             original = ['\\$', '\\%'];
             replacement = [myLeaderboard, myResult];
 
-            recipe.downloadFile(['/table'], ['Result.insert.js', myResult + '.insert.js'], original, replacement,
+            recipe.copyFile('azuremobile-'+recipename, ['/table'], ['Result.insert.js', myResult + '.insert.js'], original, replacement,
                 function (err) {
                     if (err) return callback(err);
                     callback();
@@ -70,10 +65,10 @@ exports.use = function (myMobileservice, callback) {
         function (callback) {
             // upload result table action script
             var myInsertscript = 'table/' + myResult + '.insert.js';
-            scripty.invoke('mobile script upload ' + myMobileservice + ' ' + myInsertscript, function (err, results) {
+            recipe.scripty.invoke('mobile script upload ' + myMobileservice + ' ' + myInsertscript, function (err, results) {
                 if (err) return callback(err);
                 else {
-                    console.log("Action script '" + myInsertscript + "' successfully uploaded.\n");
+                    log.info("Action script '" + myInsertscript + "' successfully uploaded.\n");
                     callback();
                 }
             });
@@ -90,18 +85,18 @@ exports.use = function (myMobileservice, callback) {
             replacement = [myLeaderboard, myResult, myNamespace];
 
             // find all client files
-            recipe.readPath(path.join(__dirname, './client_files'), function (err, results) {
+            recipe.readPath(recipe.path.join(__dirname, './client_files'), function (err, results) {
                 if (err) return callback(err);
                 files = results;
                 callback();
             });
         },
         function (callback) {
-            // download all client files and create directories
-            async.forEachSeries(
+            // copy all client files and create directories
+            recipe.async.forEachSeries(
                 files,
                 function (file, done) {
-                    recipe.downloadFile([file.dir.replace(__dirname,'')], [file.file], original, replacement,
+                    recipe.copyFile('azuremobile-'+recipename,[file.dir.replace(__dirname,'')], [file.file], original, replacement,
                         function (err) {
                             if (err) return callback(err);
                             done();
