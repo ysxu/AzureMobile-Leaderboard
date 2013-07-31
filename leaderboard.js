@@ -17,7 +17,7 @@
 
  */
 
-exports.use = function (myMobileservice, log, recipe, callback) {
+exports.use = function (myMobileservice, recipe, callback) {
 
     // variable customizations
     var recipename = 'leaderboard';
@@ -32,7 +32,7 @@ exports.use = function (myMobileservice, log, recipe, callback) {
 
     recipe.async.series([
         function (callback) {
-            log.info('Checking for table name conflicts...\n');
+            recipe.log.info('Checking for table name conflicts...\n');
 
             // create leaderboard table
             recipe.createTable(myMobileservice, "Leaderboard", function (err, results) {
@@ -51,7 +51,7 @@ exports.use = function (myMobileservice, log, recipe, callback) {
         },
         function (callback) {
             // retreive result table action script
-            log.info("Copying & Uploading action scripts...")
+            recipe.log.info("Copying & Uploading action scripts...")
 
             original = ['\\$', '\\%'];
             replacement = [myLeaderboard, myResult];
@@ -68,7 +68,7 @@ exports.use = function (myMobileservice, log, recipe, callback) {
             recipe.scripty.invoke('mobile script upload ' + myMobileservice + ' ' + myInsertscript, function (err, results) {
                 if (err) return callback(err);
                 else {
-                    log.info("Action script '" + myInsertscript + "' successfully uploaded.\n");
+                    recipe.log.info("Action script '" + myInsertscript + "' successfully uploaded.\n");
                     callback();
                 }
             });
