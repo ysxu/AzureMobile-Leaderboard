@@ -16,12 +16,11 @@
    limitations under the License.
 
  */
-
 exports.use = function (myMobileservice, recipe, callback) {
 
     // variable customizations
     var recipename = 'leaderboard';
-    
+
     var myLeaderboard = "Leaderboard";
     var myResult = "Result";
     var myNamespace = "";
@@ -55,9 +54,15 @@ exports.use = function (myMobileservice, recipe, callback) {
 
             original = ['\\$', '\\%'];
             replacement = [myLeaderboard, myResult];
-            var action_file = [{dir: 'table', file: 'Result.insert.js', new_file: myResult+'.insert.js', original: original, replacement:replacement}];
-            
-            recipe.copyFiles(recipename, action_file, function(err){
+            var action_file = [{
+                dir: 'table',
+                file: 'Result.insert.js',
+                new_file: myResult + '.insert.js',
+                original: original,
+                replacement: replacement
+            }];
+
+            recipe.copyFiles(recipename, action_file, function (err) {
                 if (err) return callback(err);
                 callback();
             });
@@ -107,7 +112,7 @@ exports.use = function (myMobileservice, recipe, callback) {
         },
         function (callback) {
             // copy client files to user environment
-            recipe.copyFiles(recipename, files, function(err){
+            recipe.copyFiles(recipename, files, function (err) {
                 if (err) return callback(err);
                 callback();
             });
