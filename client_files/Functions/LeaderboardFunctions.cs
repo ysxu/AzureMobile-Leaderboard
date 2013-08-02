@@ -15,7 +15,7 @@ public static class Globals
 }
 
 
-namespace #.Functions
+namespace $namespace.Functions
 {
 
     using System;
@@ -23,8 +23,8 @@ namespace #.Functions
     using System.Linq;
     using System.Threading.Tasks;
 
-    using #.Entities;
-    using #.Model;
+    using $namespace.Entities;
+    using $namespace.Model;
 
     using Windows.UI.Popups;
     using Windows.UI.Xaml;
@@ -37,8 +37,8 @@ namespace #.Functions
         // insert data into leaderboard tables
         public async Task<int> SendResults(string player, int hits, int misses)
         {
-            var resultsEntity = new % { PlayerName = player, Hits = hits, Misses = misses };
-            await App.MobileService.GetTable<%>().InsertAsync(resultsEntity);
+            var resultsEntity = new $result { PlayerName = player, Hits = hits, Misses = misses };
+            await App.MobileService.GetTable<$result>().InsertAsync(resultsEntity);
 
             return resultsEntity.Id;
         }

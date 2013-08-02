@@ -17,108 +17,114 @@
 
  */
 exports.use = function (myMobileservice, recipe, callback) {
-
-    // variable customizations
     var recipename = 'leaderboard';
 
-    var myLeaderboard = "Leaderboard";
-    var myResult = "Result";
-    var myNamespace = "";
+    // variable customizations
+    var myLeaderboard = "Leaderboard",
+        myResult = "Result",
+        myNamespace = "";
 
     // file customizations
-    var original = [];
-    var replacement = [];
+    var original = [],
+        replacement = [],
+        files;
+
+    // logging
+    var log = recipe.cli.output,
+        progress;
 
     recipe.async.series([
-        function (callback) {
-            recipe.log.info('Checking for table name conflicts...\n');
-
-            // create leaderboard table
-            recipe.createTable(myMobileservice, "Leaderboard", function (err, results) {
-                if (err) return callback(err);
-                myLeaderboard = results;
-                callback();
-            });
-        },
-        function (callback) {
-            // create result table
-            recipe.createTable(myMobileservice, "Result", function (err, results) {
-                if (err) return callback(err);
-                myResult = results;
-                callback();
-            });
-        },
-        function (callback) {
-            // retreive result table action script
-            recipe.log.info("Copying & Uploading action scripts...")
-
-            original = ['\\$', '\\%'];
-            replacement = [myLeaderboard, myResult];
-            var action_file = [{
-                dir: 'table',
-                file: 'Result.insert.js',
-                new_file: myResult + '.insert.js',
-                original: original,
-                replacement: replacement
-            }];
-
-            recipe.copyFiles(recipename, action_file, function (err) {
-                if (err) return callback(err);
-                callback();
-            });
-        },
-        function (callback) {
-            // upload result table action script
-            var myInsertscript = 'table/' + myResult + '.insert.js';
-            recipe.scripty.invoke('mobile script upload ' + myMobileservice + ' ' + myInsertscript, function (err, results) {
-                if (err) return callback(err);
-                else {
-                    recipe.log.info("Action script '" + myInsertscript + "' successfully uploaded.\n");
+            function (callback) {
+                // create leaderboard table
+                recipe.createTable(myMobileservice, "Leaderboard", function (err, results) {
+                    if (err) return callback(err);
+                    myLeaderboard = results;
                     callback();
-                }
-            });
-        },
-        function (callback) {
-            // prompt for existing app namespace
-            recipe.ask("Existing app namespace", recipe.REGEXP, function (name) {
-                myNamespace = name;
-                callback(null, name);
-            });
-        },
-        function (callback) {
-            // find all client files
-            recipe.readPath(recipe.path.join(__dirname, './client_files'), __dirname, function (err, results) {
-                if (err) return callback(err);
-                files = results;
-                callback();
-            });
-        },
-        function (callback) {
-            original = ['\\$', '\\%', '\\#'];
-            replacement = [myLeaderboard, myResult, myNamespace];
+                });
+            },
+            function (callback) {
+                // create result table
+                recipe.createTable(myMobileservice, "Result", function (err, results) {
+                    if (err) return callback(err);
+                    myResult = results;
+                    callback();
+                });
+            },
+            function (callback) {
+                // retreive result table script
+                log.info('');
+                progress = recipe.cli.progress('Copying scripts\n');
+                original = ['\\$leaderboard', '\\$result'];
+                replacement = [myLeaderboard, myResult];
+                var tableFile = [{
+                    dir: 'server_files/table',
+                    file: 'Result.insert.js',
+                    newFile: myResult + '.insert.js',
+                    original: original,
+                    replacement: replacement
+                }];
+                recipe.copyFiles(recipename, tableFile, function (err) {
+                    if (err) return callback(err);
+                    progress.end();
+                    callback();
+                });
+            },
+            function (callback) {
+                // upload result table script
+                var tableInsertscript = 'table/' + myResult + '.insert.js';
+                var myInsertscript = 'server_files/' + tableInsertscript;
 
-            // format client files
-            recipe.async.forEachSeries(
-                files,
-                function (file, done) {
-                    file.original = original;
-                    file.replacement = replacement;
-                    done();
-                },
-                function (err) {
+                progress = recipe.cli.progress('Uploading table script \'' + myInsertscript + '\'');
+                recipe.scripty.invoke('mobile script upload ' + myMobileservice + ' ' + tableInsertscript + ' -f ' + myInsertscript, function (err, results) {
+                    if (err) return callback(err);
+                    else {
+                        progress.end();
+                        callback();
+                    }
+                });
+            },
+            function (callback) {
+                // prompt for existing app namespace]
+                log.info('');
+                recipe.ask("Existing app namespace: ", recipe.REGEXP, function (name) {
+                    myNamespace = name;
+                    callback(null, name);
+                });
+            },
+            function (callback) {
+                // find all client files
+                recipe.readPath(recipe.path.join(__dirname, './client_files'), __dirname, function (err, results) {
+                    if (err) return callback(err);
+                    files = results;
+                    callback();
+                });
+            },
+            function (callback) {
+                original = ['\\$leaderboard', '\\$result', '\\$namespace'];
+                replacement = [myLeaderboard, myResult, myNamespace];
+                // format client files
+                recipe.async.forEachSeries(
+                    files,
+                    function (file, done) {
+                        file.original = original;
+                        file.replacement = replacement;
+                        done();
+                    },
+                    function (err) {
+                        if (err) return callback(err);
+                        callback();
+                    });
+            },
+            function (callback) {
+                // copy client files to user environment
+                recipe.copyFiles(recipename, files, function (err) {
                     if (err) return callback(err);
                     callback();
                 });
-        },
-        function (callback) {
-            // copy client files to user environment
-            recipe.copyFiles(recipename, files, function (err) {
-                if (err) return callback(err);
-                callback();
-            });
-        },
-        function () {
+            }
+        ],
+        function (err, results) {
+            if (err) throw err;
             callback();
-        }
-    ]);
+        });
 }

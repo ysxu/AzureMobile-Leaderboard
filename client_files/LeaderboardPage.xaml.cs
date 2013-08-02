@@ -5,7 +5,7 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-namespace #
+namespace $namespace
 {
     using System;
     using System.Diagnostics;
@@ -16,9 +16,9 @@ namespace #
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
 
-    using #.Functions;
-    using #.Entities;
-    using #.Model;    
+    using $namespace.Functions;
+    using $namespace.Entities;
+    using $namespace.Model;    
 
 
     /// <summary>
@@ -56,7 +56,7 @@ namespace #
             var leaderboardUpdated = false;
             while (!leaderboardUpdated && sw.ElapsedMilliseconds < 5000)
             {
-                var aux = await App.MobileService.GetTable<%>().Where(r => r.Id == Globals.ResultId).ToEnumerableAsync();
+                var aux = await App.MobileService.GetTable<$result>().Where(r => r.Id == Globals.ResultId).ToEnumerableAsync();
 
                 var resultsItem = aux.Single();
                 leaderboardUpdated = resultsItem.LeaderboardUpdated;
@@ -66,7 +66,7 @@ namespace #
 
             if (leaderboardUpdated)
             {
-                var leaderboardItems = await App.MobileService.GetTable<$>().ToEnumerableAsync();
+                var leaderboardItems = await App.MobileService.GetTable<$leaderboard>().ToEnumerableAsync();
                 leaderboardItems = leaderboardItems.OrderBy(item => item.Position).Take(5);
 
                 var model = new LeaderboardModel();

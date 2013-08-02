@@ -2,7 +2,7 @@ AzureMobile-Leaderboard
 =======================
 
 Automated backend set up for azure mobile leaderboard using azure-scripty. 
-The general code flow and Result table action script follow the instructions at http://code.msdn.microsoft.com/windowsapps/Adding-a-Leaderboard-to-1f9d216d.
+The general code flow and Result table script follow the instructions at http://code.msdn.microsoft.com/windowsapps/Adding-a-Leaderboard-to-1f9d216d.
 
 
 # Getting started
@@ -23,7 +23,7 @@ To set up leaderboard with azure-cli installed and user account downloaded and i
 azure mobile recipe use leaderboard
 ```
 
-The module will create a Leaderboard table and a Result table, configure their action scripts, and download neccessary client-side files in the same directory as where the module is called.
+The module will create a Leaderboard table and a Result table, configure their scripts, and download neccessary client-side files in the same directory as where the module is called.
 
 
 ## Use it

@@ -1,6 +1,6 @@
 function insert(item, user, request) {
     resultsItem = item;
-    lbTable = tables.getTable('$');
+    lbTable = tables.getTable('$leaderboard');
 
     request.execute({
         success: function () {
@@ -53,13 +53,13 @@ function updatePosition() {
         "With cte As " +
         "(SELECT score,position, " +
         "ROW_NUMBER() OVER (ORDER BY score DESC) AS newposition " +
-        "FROM $) " +
+        "FROM $leaderboard) " +
         "UPDATE cte SET position = newposition";
     mssql.query(sql, {
         success: function (results) {
             console.log("Leaderboard positions updated.");
 
-            var resultsTable = tables.getTable('%');
+            var resultsTable = tables.getTable('$result');
             resultsTable.update({
                 id: resultsItem.id,
                 leaderboardUpdated: true

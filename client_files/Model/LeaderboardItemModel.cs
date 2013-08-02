@@ -5,7 +5,7 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-namespace #.Model
+namespace $namespace.Model
 {
     public class LeaderboardItemModel
     {

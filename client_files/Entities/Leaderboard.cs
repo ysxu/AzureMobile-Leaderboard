@@ -5,11 +5,11 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-namespace #.Entities
+namespace $namespace.Entities
 {
     using System.Runtime.Serialization;
 
-    public class $
+    public class $leaderboard
     {
         [DataMember(Name = "id")]
         public int Id { get; set; }
