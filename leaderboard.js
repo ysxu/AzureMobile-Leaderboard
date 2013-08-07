@@ -16,7 +16,7 @@
    limitations under the License.
 
  */
-exports.use = function (myMobileservice, recipe, callback) {
+exports.execute = function (myMobileservice, recipe, callback) {
     var recipename = 'leaderboard';
 
     // variable customizations
@@ -86,7 +86,7 @@ exports.use = function (myMobileservice, recipe, callback) {
             function (callback) {
                 // prompt for existing app namespace]
                 log.info('');
-                recipe.ask("Existing app namespace: ", recipe.REGEXP, function (name) {
+                recipe.ask("Existing app namespace: ", recipe.REGEXP, "Namespace format not recognized", function (name) {
                     myNamespace = name;
                     callback(null, name);
                 });
