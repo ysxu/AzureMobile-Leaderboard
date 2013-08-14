@@ -2,7 +2,8 @@ AzureMobile-Leaderboard
 =======================
 
 This recipe automates backend set up and fetches client files with Azure Mobile Services to provide Windows Store apps with a leaderboard solution. 
-
+Platform: Windows Store Apps
+Project language: C#
 
 # Getting started
 
